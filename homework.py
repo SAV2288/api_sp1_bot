@@ -1,8 +1,10 @@
 import os
+import time
+
+from dotenv import load_dotenv
 import requests
 import telegram
-import time
-from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -10,6 +12,9 @@ load_dotenv()
 PRACTICUM_TOKEN = os.getenv("PRACTICUM_TOKEN")
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+
+proxy = telegram.utils.request.Request(proxy_url='socks5://5.133.202.167:19619')    # proxy для отправки сообщений
+bot = telegram.Bot(token=TELEGRAM_TOKEN, request=proxy) # telegram bot
 
 
 def parse_homework_status(homework):
@@ -33,13 +38,12 @@ def get_homework_statuses(current_timestamp):
 
 
 def send_message(message):
-    proxy = telegram.utils.request.Request(proxy_url='socks5://5.133.202.167:19619')
-    bot = telegram.Bot(token=TELEGRAM_TOKEN, request=proxy)
     return bot.send_message(chat_id=CHAT_ID, text=message)
 
 
 def main():
     current_timestamp = int(time.time())  # начальное значение timestamp
+    bot.send_message(chat_id=CHAT_ID, text="Мониторинг статуса проверки домашнего задания активирован")
 
     while True:
         try:
